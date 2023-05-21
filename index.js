@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -28,6 +28,8 @@ async function run() {
     client.connect();
 
     const toysCollection = client.db("enlightenToys").collection("allToys");
+    const insertedToysCollection = client.db('enlightenToys').collection('allInsertedToys');
+
 
     app.get("/allToys", async (req, res) => {
       const result = await toysCollection.find({}).toArray();
@@ -51,7 +53,20 @@ async function run() {
       res.send(result);
     })
 
+    app.delete('/allSelectedToys/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await toysCollection.deleteOne(query);
+      res.send(result);
+    })
 
+    
+    app.get('/insertedToys', async(req, res) => {
+      const result = await insertedToysCollection.find().toArray();
+      res.send(result);
+    })
+
+  
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
