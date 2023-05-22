@@ -32,7 +32,7 @@ async function run() {
 
 
     app.get("/allToys", async (req, res) => {
-      const result = await toysCollection.find({}).toArray();
+      const result = await toysCollection.find({}).limit(20).toArray();
       res.send(result);
     });
 
@@ -82,9 +82,23 @@ async function run() {
         toyData,
         option
       );
-      console.log(result);
       res.send(result);
     });
+
+    
+    app.get("/toySearchByName/:text", async (req, res) => {
+      const searchText = req.params.text;
+      const result = await toysCollection
+        .find({
+          $or: [
+            { toyName: { $regex: searchText, $options: "i" } },
+            { subCategory: { $regex: searchText, $options: "i" } },
+          ],
+        })
+        .toArray();
+      res.send(result);
+    });
+
 
     app.delete('/allSelectedToys/:id', async(req, res) => {
       const id = req.params.id;
