@@ -36,6 +36,15 @@ async function run() {
       res.send(result);
     });
 
+    // toyDetails data fetch
+    app.get('/allToys/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await toysCollection.findOne(query);
+      console.log(result)
+      res.send(result);
+    });
+
     app.post('/postToy', async(req, res) => {
       const body = req.body;
       const result = await toysCollection.insertOne(body);
